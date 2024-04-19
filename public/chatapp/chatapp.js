@@ -20,6 +20,8 @@ const uploadConfirmation = document.getElementById('uploadconfirm')
 
 
 let emails = []
+let isAdmin
+
 //console.log(createName)
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('groupId', groupId)
         console.log('data',formData)
         try {
-            const response = await axios.post('http://localhost:3000/user/uploadfile', formData, {headers: 
+            const response = await axios.post('http://13.60.45.41:3000/user/uploadfile', formData, {headers: 
             {
             "Authorization": token,
             'Content-Type': 'multipart/form-data'
@@ -56,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             var linkElement = document.createElement("a");
             linkElement.href = response.data.fileURL;
+            console.log(response.data.fileURL.Error)
             const currentDate = new Date();
             const year = currentDate.getFullYear();
             const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
@@ -95,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var emailArray = emails
         console.log(groupName)
         try{
-            const response = await axios.post('http://localhost:3000/user/newgroup', {groupName, emailArray}, {headers :{"Authorization": token }})
+            const response = await axios.post('http://13.60.45.41:3000/user/newgroup', {groupName, emailArray}, {headers :{"Authorization": token }})
             console.log(response)
         }catch(err){
             console.log(err)
@@ -122,9 +125,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    async function deleteGroup(groupId){
+        try{
+            const response = await axios.post('http://13.60.45.41:3000/group/delete-group', {groupId})
+            console.log(response)
+            fetchGroups()
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     async function postUser(groupId, groupName, email){
         try{
-            const response = await axios.post('http://localhost:3000/user/adduser-to-group', {groupId, groupName, email})
+            const response = await axios.post('http://13.60.45.41:3000/user/adduser-to-group', {groupId, groupName, email})
             console.log(response)
             fetchGroupUsers(groupId)
         }catch(err){
@@ -137,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault()
         const email = userEmail.value
         try{
-            const users = await axios.post('http://localhost:3000/user/search-user',{email})
+            const users = await axios.post('http://13.60.45.41:3000/user/search-user',{email})
             console.log(users)
             const displayuserDiv = document.getElementById('list-users')
             const userDiv = document.createElement('div')
@@ -154,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userDiv.append(addUserToListButton)
             //console.log(userDiv)
             displayuserDiv.appendChild(userDiv)
-            email.value = ""
+            userEmail.value = ""
         }catch(err){
             console.log(err)
             const displayuserDiv = document.getElementById('list-users')
@@ -180,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //console.log(groupId)
         console.log('message',messageText)
         try{
-            const response = await axios.post('http://localhost:3000/user/chat', {messageText, groupId}, {headers :{"Authorization": token }})
+            const response = await axios.post('http://13.60.45.41:3000/user/chat', {messageText, groupId}, {headers :{"Authorization": token }})
             //console.log(response.data.chats.message)
             chatInput.value = '';
             uploadConfirmation.style.display = 'none'
@@ -195,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //fetchAndDisplayChats()
     fetchGroups()
 
-    const socket = io();
+    
     // socket.on('newChatMessage', (message) => {
     //     // Append the new message to the chat window
     //    console.log(message)
@@ -223,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('lastmessageid:',lastMessageid)
         
        try{
-            const response = await axios.get(`http://localhost:3000/user/chats?lastMessageid=${lastMessageid}&groupid=${groupId}`,{headers: {'Authorization': token }});
+            const response = await axios.get(`http://13.60.45.41:3000/user/chats?lastMessageid=${lastMessageid}&groupid=${groupId}`,{headers: {'Authorization': token }});
             console.log(response.data.chats)
             const chats = response.data.chats
             const lastTenChats = JSON.stringify(chats.slice(-5))
@@ -246,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function showChatsOnScreen(Chats,groupId){
-            chatMessages.innerText = ""
+            chatMessages.innerHTML = ""
             chatMessages.innerHTML = `<div id='oldmessagebtn'><button id="load-messages" class="btn btn-secondary btn-sm">Load Older messages</button></div>`
             const loadMessages = document.getElementById('load-messages')
             loadMessages.addEventListener('click', () => {
@@ -291,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(firstChat)
             const firstMessageId = firstChat.id
             console.log(firstMessageId)
-            const response = await axios.get(`http://localhost:3000/user/chats?lastMessageid=${lastMessageid}&firstMessageId=${firstMessageId}&groupid=${groupId}`,{headers: {'Authorization': token }});
+            const response = await axios.get(`http://13.60.45.41:3000/user/chats?lastMessageid=${lastMessageid}&firstMessageId=${firstMessageId}&groupid=${groupId}`,{headers: {'Authorization': token }});
             const chats = response.data.chats
             console.log(typeof(chats))
             const chatsJSON = JSON.stringify(chats);
@@ -322,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchGroupUsers(groupId){
-        const response = await axios.get(`http://localhost:3000/group/getgroupsusers?groupid=${groupId}`);
+        const response = await axios.get(`http://13.60.45.41:3000/group/getgroupsusers?groupid=${groupId}`);
         console.log(response.data.groupusers)
         const Users = response.data.groupusers
         groupUsers.innerHTML = ""
@@ -330,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //console.log(userName.userName)
         //console.log('user>>>',username)
         const jwtToken = localStorage.getItem('jwtToken')
-        const isAdmin = await checkAdminStatus(groupId, jwtToken)
+        isAdmin = await checkAdminStatus(groupId, jwtToken)
         console.log('isadmin',isAdmin)
         Users.forEach(user => {
             const userDiv = document.createElement('div')
@@ -367,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function checkAdminStatus(groupId, token) {
-        const response = await axios.get(`http://localhost:3000/group/checkadminstatus?groupid=${groupId}`,{headers: {'Authorization': token }});
+        const response = await axios.get(`http://13.60.45.41:3000/group/checkadminstatus?groupid=${groupId}`,{headers: {'Authorization': token }});
         //return response.data
         console.log(response.data.isadmin)
         //console.log(typeof(response.data.isadmin))
@@ -375,20 +388,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function makeAdmin(userId,groupId){
-        const response = await axios.post(`http://localhost:3000/group/addadmin`,{userId,groupId});
+        const response = await axios.post(`http://13.60.45.41:3000/group/addadmin`,{userId,groupId});
         console.log(response.data)
         fetchGroupUsers(groupId)
     }
 
     async function removeUser(userId,groupId){
-        const response = await axios.post(`http://localhost:3000/group/removeuser`,{userId,groupId});
+        const response = await axios.post(`http://13.60.45.41:3000/group/removeuser`,{userId,groupId});
         console.log(response.data)
         fetchGroupUsers(groupId)
     }
-
+    const socket = io()
     async function fetchGroups() {
+        
         try {
-            const response = await axios.get(`http://localhost:3000/group/getgroups`, { headers: {'Authorization': token } });
+            const response = await axios.get(`http://13.60.45.41:3000/group/getgroups`, { headers: {'Authorization': token } });
             const groups = response.data.group;
             groupHeader.innerHTML = "";
     
@@ -414,17 +428,25 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     
             groups.forEach(group => {
+                
                 const groupDiv = document.createElement('div');
                 const buttonDiv = document.createElement('div');
                 const link = document.createElement("a");
                 link.href = '#';
                 link.textContent = `${group.groupname}`;
     
-                link.addEventListener("click", () => {
+                link.addEventListener("click", async () => {
                     chatWindow.style.display = 'block';
                     chatHeader.innerText = group.groupname;
-                    fetchGroupUsers(group.id);
+                    await fetchGroupUsers(group.id);
+                    //currentGroupId = group.id;
+
                     fetchAndDisplayChats(group.id);
+                    socket.on('newChatMessage', (chats) => {
+                        console.log(chats)
+                        fetchAndDisplayChats(group.id)
+                    })
+                    
     
                     // Update currentGroupId to the clicked group's ID
                     currentGroupId = group.id;
@@ -433,15 +455,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttonDiv.innerHTML = "";
                     addUserInput.style.display = 'none';
                     const addUserButton = document.createElement('button');
+                    const groupDeleteButton = document.createElement('button')
                     addUserButton.classList = "btn btn-primary";
                     addUserButton.innerText = "Add Users to Group";
-                    
+                    groupDeleteButton.classList = "btn btn-primary";
+                    groupDeleteButton.innerText = 'Delete Group'
+                    addUserButton.style.marginRight = '10px';
+                    console.log('>>>>',isAdmin)
                     // Check if the user is an admin and add event listener to addUserButton accordingly
                     if (isAdmin) {
                         addUserButton.addEventListener('click', () => {
                             addUsers(group.groupname, group.id);
                         });
+                        groupDeleteButton.addEventListener('click', () => {
+                            deleteGroup(group.id)
+                        })
                         buttonDiv.appendChild(addUserButton);
+                        buttonDiv.appendChild(groupDeleteButton)
                     }
     
                     groupDiv.appendChild(buttonDiv);

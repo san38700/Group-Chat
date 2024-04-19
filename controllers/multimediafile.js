@@ -22,15 +22,29 @@ exports.multimediaFiles = async(req, res) => {
     console.log('Uploaded file:', file);
     console.log('File name:', fileName);
     
-    try{     
+
+    try {
         const fileURL = await s3services.uploadToS3(process.env.BUCKET_NAME, fileData, AWSfileName);
+        console.log(fileURL)
+        fs.unlinkSync(file.path);
+        
+        res.status(201).json({ fileName, fileURL, success: true });
+    } catch (err) {
+        console.error(err);
+        fs.unlinkSync(file.path); // Remove the file from the server even if S3 upload fails
+        res.status(500).json({ error: 'Failed to upload file to S3' });
+        return; // Stop further execution
+    }
+    // try{     
+    //     const fileURL = await s3services.uploadToS3(process.env.BUCKET_NAME, fileData, AWSfileName);
         
 
-        fs.unlinkSync(file.path);
+    //     fs.unlinkSync(file.path);
 
 
-        res.status(201).json({ fileName, fileURL, success: true });
-    }catch(err){
-        console.log(err)
-    }
+    //     res.status(201).json({ fileName, fileURL, success: true });
+    // }catch(err){
+    //     res.status(500).json(err)
+    //     console.log(err)
+    // }
 };

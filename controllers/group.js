@@ -1,5 +1,6 @@
 const Group = require('../models/group')
 const User = require('../models/user')
+const Chat = require('../models/chat')
 const UserGroup = require('../models/usergroup')
 const { Op, where } = require('sequelize');
 const sequelize = require('../util/database')
@@ -123,5 +124,16 @@ exports.checkAdminStatus = async (req, res) => {
         }catch(err){
         console.log(err)
         res.status(500).json({message: 'Internal Server Error'})
+    }
+}
+
+exports.deleteGroup = async (req, res) => {
+    const {groupId} = req.body
+    try{
+        const removegroup = await Group.destroy({where: {id: groupId}})
+        const removeChat = await Chat.destroy({where: {groupId: groupId}})
+        res.status(201).json({removegroup, removeChat, message: 'Group Deleted'})
+    }catch(err){
+        console.log(err)
     }
 }

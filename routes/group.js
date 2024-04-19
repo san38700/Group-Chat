@@ -12,5 +12,6 @@ router.post('/group/addadmin',groupController.addAdmin)
 router.post('/group/removeuser',groupController.removeUser)
 router.post('/user/adduser-to-group', groupController.addUserToGroup)
 router.get('/group/checkadminstatus', userAuthentication.userAuthentication, groupController.checkAdminStatus)
+router.post('/group/delete-group',groupController.deleteGroup)
 
 module.exports = router
