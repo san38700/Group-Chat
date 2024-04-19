@@ -3,16 +3,20 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url('image.jpeg');
+    background-size: cover; /* Ensures the background image covers the entire body */
+    background-repeat: no-repeat; /* Prevents the background image from repeating */
 }
 
-.chat-container {
+
+/* .chat-container {
     width: 700px;
     margin: 100px 50px 100px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
     overflow: hidden;
     float: right;
-}
+} */
 
 .chat-header {
     background-color: #b8d341;
@@ -74,14 +78,14 @@ body {
     border: none;
     cursor: pointer;
 }
-.users-container {
+/* .users-container {
     width: 500px;
     margin: 20px 20px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     float: left;
-}
+} */
 
 .group-name {
     font-weight: bold;
@@ -132,4 +136,26 @@ body {
     /* Darken the button color on hover */
     background-color: #28a745; /* Darker shade of green */
     /* You can also add other hover effects here */
+}
+.chat-container {
+    width: 450px;
+    margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    float: right;
+    margin-left: 50px;
+    margin-right: 350px;
+}
+
+.users-container {
+    width: 500px;
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    float: left;
+    display: block;
+    margin-left: 50px;
+    margin-right: auto;
 }
